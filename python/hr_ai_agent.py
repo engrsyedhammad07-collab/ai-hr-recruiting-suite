@@ -14,14 +14,14 @@ load_dotenv()
 app = FastAPI(title="AI HR Recruiting Agent Backend")
 
 origins = [
-    "https://ai-hr-recruiting-suite.vercel.app",  # Replace with your actual Vercel domain if different
+    "https://ai-hr-recruiting-suite.vercel.app",
     "http://localhost:3000",
     "http://localhost:3001"
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allows all origins safely for your current deployment setup
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

@@ -78,8 +78,10 @@ export function SingleEvaluation({ activeJd, addLog }: SingleEvaluationProps) {
     formData.append("job_description", targetJdContent)
     formData.append("resume", resumeFile)
 
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+
     try {
-      const response = await fetch("http://localhost:8000/api/evaluate", {
+      const response = await fetch(`${apiUrl}/api/evaluate`, {
         method: "POST",
         body: formData,
       })

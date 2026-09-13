@@ -11,8 +11,6 @@ import {
   FileSpreadsheet, 
   Search, 
   SlidersHorizontal,
-  ChevronRight,
-  UserCheck,
   Briefcase,
   Award,
   AlertTriangle,
@@ -121,11 +119,13 @@ export function BatchAnalysis() {
     })
     formData.append("job_description", jobDescription)
 
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+
     try {
       setProgress(40)
       addLog("Sending payload to backend FastAPI evaluation pipeline...", "info")
 
-      const response = await fetch("http://localhost:8000/api/analyze", {
+      const response = await fetch(`${apiUrl}/api/analyze`, {
         method: "POST",
         body: formData,
       })
@@ -219,7 +219,7 @@ export function BatchAnalysis() {
       case "Strong Hire":
         return <span className="px-2.5 py-1 text-xs font-semibold bg-emerald-100 text-emerald-800 rounded-full flex items-center gap-1 w-fit"><CheckCircle2 className="w-3 h-3" /> Strong Hire</span>
       case "Interview":
-        return <span className="px-2.5 py-1 text-xs font-semibold bg-blue-100 text-blue-800 rounded-full flex items-center gap-1 w-fit"><UserCheck className="w-3 h-3" /> Interview</span>
+        return <span className="px-2.5 py-1 text-xs font-semibold bg-blue-100 text-blue-800 rounded-full flex items-center gap-1 w-fit">Interview</span>
       case "Review":
         return <span className="px-2.5 py-1 text-xs font-semibold bg-amber-100 text-amber-800 rounded-full flex items-center gap-1 w-fit"><AlertTriangle className="w-3 h-3" /> Review</span>
       case "Reject":
