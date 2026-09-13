@@ -25,7 +25,8 @@ GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
 client = OpenAI(
     api_key=GROQ_API_KEY,
-    base_url="https://api.groq.com/openai/v1"
+    base_url="https://api.groq.com/openai/v1",
+    http_client=None
 )
 
 def get_valid_model():
@@ -150,9 +151,6 @@ async def analyze_batch(job_description: str = Form(...), resumes: List[UploadFi
         for idx, resume_file in enumerate(resumes):
             file_bytes = await resume_file.read()
             with pdfplumber.open(io.BytesIO(file_bytes)) as pdf:
-                res_text = "".join([page.extract_test() + "\n" for page in pdf.pages if page.extract_text()]) if hasattr(pdf.pages[0], 'extract_text') else ""
-            if not res_text.strip():
-                # fallback text gathering if needed
                 res_text = "".join([page.extract_text() + "\n" for page in pdf.pages if page.extract_text()])
             if not res_text.strip():
                 continue
@@ -168,7 +166,7 @@ async def analyze_batch(job_description: str = Form(...), resumes: List[UploadFi
                 {"role": "system", "content": f"Compare candidate profile against job description and respond ONLY with a valid JSON object matching this schema:\n{match_schema}. IMPORTANT: The 'recommendation' field MUST be EXACTLY one of these three strings: 'Shortlist', 'Maybe', or 'Reject'."},
                 {"role": "user", "content": eval_prompt}
             ])
-            match_result = JobMatchResult.model_validate_json(comp_eval.choices[0].message.content)
+            match_result = JobMatchResult.model_validate_json(comp_eval.choices[0].example if hasattr(comp_eval.choices[0], 'example') else comp_eval.choices[0].message.content)
 
             batch_results.append({
                 "id": idx + 1,
