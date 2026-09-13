@@ -163,10 +163,10 @@ async def analyze_batch(job_description: str = Form(...), resumes: List[UploadFi
 
             eval_prompt = f"Candidate Profile:\n{profile.model_dump_json()}\n\nJob Description:\n{job_description}"
             comp_eval = call_groq_with_retry([
-                {"role": "system", "content": f"Compare candidate profile against job description and respond ONLY with a valid JSON object matching this schema:\n{match_schema}. IMPORTANT: The 'recommendation' field MUST be EXACTLY one of these three strings: 'Shortlist', 'Maybe', or 'Reject'."},
+                {"role": "system", "content": f"Compare candidate profile against job description and respond ONLY with a valid JSON object matching this schema:\n{match_schema}. IMPORTANT: The 'recommendation' field MUST be EXACTLY one of these three strings: `Shortlist`, `Maybe`, or `Reject`."},
                 {"role": "user", "content": eval_prompt}
             ])
-            match_result = JobMatchResult.model_validate_json(comp_eval.choices[0].example if hasattr(comp_eval.choices[0], 'example') else comp_eval.choices[0].message.content)
+            match_result = JobMatchResult.model_validate_json(comp_eval.choices[0].message.content)
 
             batch_results.append({
                 "id": idx + 1,
