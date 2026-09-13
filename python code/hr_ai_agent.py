@@ -7,6 +7,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from openai import OpenAI
 import pdfplumber
 from pydantic import BaseModel, Field
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = FastAPI(title="AI HR Recruiting Agent Backend")
 
@@ -18,14 +21,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-client = OpenAI(
-   import os
-from dotenv import load_dotenv
-
-load_dotenv()
-)
-# Replace your raw API key string with this:
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+
+client = OpenAI(
+    api_key=GROQ_API_KEY,
     base_url="https://api.groq.com/openai/v1"
 )
 
@@ -55,7 +54,7 @@ def get_valid_model():
     except Exception as e:
         print(f"[WARN] Could not fetch model list dynamically: {e}")
         
-    return "openai/gpt-oss-20b"
+    return "llama-3.1-8b-instant"
 
 ACTIVE_MODEL = get_valid_model()
 
@@ -151,6 +150,9 @@ async def analyze_batch(job_description: str = Form(...), resumes: List[UploadFi
         for idx, resume_file in enumerate(resumes):
             file_bytes = await resume_file.read()
             with pdfplumber.open(io.BytesIO(file_bytes)) as pdf:
+                res_text = "".join([page.extract_test() + "\n" for page in pdf.pages if page.extract_text()]) if hasattr(pdf.pages[0], 'extract_text') else ""
+            if not res_text.strip():
+                # fallback text gathering if needed
                 res_text = "".join([page.extract_text() + "\n" for page in pdf.pages if page.extract_text()])
             if not res_text.strip():
                 continue
