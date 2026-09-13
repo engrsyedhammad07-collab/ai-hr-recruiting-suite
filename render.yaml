@@ -2,7 +2,6 @@ services:
   - type: web
     name: ai-hr-recruiting-backend
     env: python
-    region: frankfurt # Or whichever region you prefer
     plan: free
     rootDir: python code
     buildCommand: pip install -r requirements.txt
